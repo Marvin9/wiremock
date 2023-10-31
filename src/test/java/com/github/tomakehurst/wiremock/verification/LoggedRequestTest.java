@@ -16,6 +16,7 @@
 package com.github.tomakehurst.wiremock.verification;
 
 import static com.github.tomakehurst.wiremock.http.HttpHeader.httpHeader;
+import static com.github.tomakehurst.wiremock.http.RequestMethod.GET;
 import static com.github.tomakehurst.wiremock.http.RequestMethod.POST;
 import static com.github.tomakehurst.wiremock.testsupport.MockRequestBuilder.aRequest;
 import static com.github.tomakehurst.wiremock.verification.LoggedRequest.createFrom;
@@ -27,14 +28,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.common.Dates;
 import com.github.tomakehurst.wiremock.common.Json;
-import com.github.tomakehurst.wiremock.http.Cookie;
-import com.github.tomakehurst.wiremock.http.HttpHeaders;
-import com.github.tomakehurst.wiremock.http.RequestMethod;
+import com.github.tomakehurst.wiremock.http.*;
+import com.github.tomakehurst.wiremock.testsupport.MockRequestBuilder;
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -206,5 +203,40 @@ public class LoggedRequestTest {
 
     assertEquals("test-param-2", req.queryParameter("test-param-2").key());
     assertEquals("value-2", req.queryParameter("test-param-2").firstValue());
+  }
+
+  @Test
+  public void verifyRequestMultipart() {
+    Collection<Request.Part> part = new ArrayList<>();
+    part.add(
+        new Request.Part() {
+          @Override
+          public String getName() {
+            return "part-1";
+          }
+
+          @Override
+          public HttpHeader getHeader(String name) {
+            return new HttpHeader("content/type", "application/json");
+          }
+
+          @Override
+          public HttpHeaders getHeaders() {
+            return null;
+          }
+
+          @Override
+          public Body getBody() {
+            return null;
+          }
+        });
+
+    MockRequestBuilder requestBuilder = aRequest().withUrl("/for/logging").withMethod(GET);
+    LoggedRequest requestWithMultipart = createFrom(requestBuilder.withMultiparts(part).build());
+    LoggedRequest requestWithoutMultipart = createFrom(requestBuilder.withMultiparts(null).build());
+
+    assertEquals("part-1", requestWithMultipart.getPart("part-1").getName());
+    assertNull(requestWithoutMultipart.getPart("non-exists"));
+    assertNull(requestWithMultipart.getPart(null));
   }
 }
