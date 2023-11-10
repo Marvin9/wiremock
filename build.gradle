@@ -280,6 +280,8 @@ jar {
   manifest {
     attributes("Main-Class": "wiremock.Run")
     attributes("Add-Exports": "java.base/sun.security.x509")
+    attributes("Implementation-Version": project.version)
+    attributes("Implementation-Title": "WireMock")
   }
 }
 
@@ -434,6 +436,7 @@ task 'bump-beta-version' {
     def filesWithVersion = [
       'build.gradle'                                      : { "version = '${it}" },
       'ui/package.json'                                   : { "\"version\": \"${it}\"" },
+      'src/main/resources/version.properties'             : { "version=${it}" },
       'src/main/resources/swagger/wiremock-admin-api.json': { "\"version\": \"${it}\"" },
       'src/main/resources/swagger/wiremock-admin-api.yaml': {
         "version: ${it}"
@@ -462,6 +465,7 @@ task 'bump-patch-version' {
     def filesWithVersion = [
       'build.gradle'                                      : { "version = '${it}" },
       'ui/package.json'                                   : { "\"version\": \"${it}\"" },
+      'src/main/resources/version.properties'             : { "version=${it}" },
       'src/main/resources/swagger/wiremock-admin-api.json': { "\"version\": \"${it}\"" },
       'src/main/resources/swagger/wiremock-admin-api.yaml': {
         "version: ${it}"
@@ -490,6 +494,7 @@ task 'bump-minor-version' {
     def filesWithVersion = [
       'build.gradle'                                      : { "version = '${it}" },
       'ui/package.json'                                   : { "\"version\": \"${it}\"" },
+      'src/main/resources/version.properties'             : { "version=${it}" },
       'src/main/resources/swagger/wiremock-admin-api.json': { "\"version\": \"${it}\"" },
       'src/main/resources/swagger/wiremock-admin-api.yaml': {
         "version: ${it}"
